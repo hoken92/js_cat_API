@@ -58,6 +58,7 @@ async function initialLoad() {
  */
 breedSelect.addEventListener("change", (evt) => {
   Carousel.clear();
+  infoDump.removeChild(infoDump.firstElementChild);
   const selectedBreed = evt.target.value;
 
   createBreedElements(selectedBreed);

@@ -24,22 +24,18 @@ const API_KEY =
  */
 initialLoad();
 
+// console.log(breedSelect);
 async function initialLoad() {
-  const response = await fetch("https://api.thecatapi.com/v1/breeds", {
-    method: "GET",
-    headers: {
-      "x-api-key": API_KEY,
-    },
-  });
-  const data = await response.json();
-  console.log(data);
+  const response = await axios.get(`https://api.thecatapi.com/v1/breeds`);
 
-  data.forEach((item) => {
+  console.log(response.data);
+
+  response.data.forEach((item) => {
     let optionEl = breedSelect.appendChild(document.createElement("option"));
     optionEl.textContent = item.name;
   });
 
-  createBreedElements(data[0].name);
+  createBreedElements(response.data[0].id);
 }
 
 /**
@@ -64,33 +60,26 @@ breedSelect.addEventListener("change", (evt) => {
 });
 
 async function getBreedInfo(breed) {
-  const response = await fetch(
-    `https://api.thecatapi.com/v1/breeds/search?q=${breed}&attach_image=1?limit=1`,
-    {
-      method: "GET",
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    }
+  const response = await axios.get(
+    `https://api.thecatapi.com/v1/breeds/search?q=${breed}&attach_image=1?limit=1`
   );
-  const data = await response.json();
 
-  return data;
+  return response.data;
 }
 
 async function createBreedElements(breed) {
-  const data = await getBreedInfo(breed);
+  const breedData = await getBreedInfo(breed);
 
-  const item = Carousel.createCarouselItem(
-    data[0].image.url,
-    data[0].name,
-    data[0].image.id
+  const response = await axios.get(
+    `https://api.thecatapi.com/v1/images/search?breed_id=${breedData[0].id}&limit=10`
   );
 
-  Carousel.appendCarousel(item);
+  console.log(response.data);
 
-  const breedInfo = infoDump.appendChild(document.createElement("p"));
-  breedInfo.textContent = data[0].description;
+  response.data.forEach((item) => {
+    const newItem = Carousel.createCarouselItem(item.url, item.id);
+    Carousel.appendCarousel(newItem);
+  });
 }
 
 /**

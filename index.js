@@ -24,6 +24,8 @@ const API_KEY =
  */
 initialLoad();
 
+// console.log(breedSelect);
+console.log(infoDump);
 async function initialLoad() {
   const response = await fetch("https://api.thecatapi.com/v1/breeds", {
     method: "GET",
@@ -32,7 +34,6 @@ async function initialLoad() {
     },
   });
   const data = await response.json();
-  console.log(data);
 
   data.forEach((item) => {
     let optionEl = breedSelect.appendChild(document.createElement("option"));

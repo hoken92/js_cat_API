@@ -25,7 +25,6 @@ const API_KEY =
 initialLoad();
 
 // console.log(breedSelect);
-console.log(infoDump);
 async function initialLoad() {
   const response = await fetch("https://api.thecatapi.com/v1/breeds", {
     method: "GET",
@@ -80,18 +79,29 @@ async function getBreedInfo(breed) {
 }
 
 async function createBreedElements(breed) {
-  const data = await getBreedInfo(breed);
-
-  const item = Carousel.createCarouselItem(
-    data[0].image.url,
-    data[0].name,
-    data[0].image.id
+  const breedData = await getBreedInfo(breed);
+  const response = await fetch(
+    `https://api.thecatapi.com/v1/images/search?breed_id=${breedData[0].id}&limit=10`,
+    {
+      method: "GET",
+      headers: {
+        "x-api-key": API_KEY,
+      },
+    }
   );
 
-  Carousel.appendCarousel(item);
+  const data = await response.json();
 
+  data.forEach((item) => {
+    const newItem = Carousel.createCarouselItem(
+      item.url,
+      item.breeds[0].name,
+      item.id
+    );
+    Carousel.appendCarousel(newItem);
+  });
   const breedInfo = infoDump.appendChild(document.createElement("p"));
-  breedInfo.textContent = data[0].description;
+  breedInfo.textContent = data[0].breeds[0].description;
 }
 
 /**

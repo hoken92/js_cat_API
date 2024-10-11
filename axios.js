@@ -72,8 +72,13 @@ async function createBreedElements(breed) {
     `https://api.thecatapi.com/v1/images/search?breed_id=${breedData[0].id}&limit=10`
   );
 
+  console.log(response.data);
   response.data.forEach((item) => {
-    const newItem = Carousel.createCarouselItem(item.url, item.id);
+    const newItem = Carousel.createCarouselItem(
+      item.url,
+      breedData.name,
+      item.id
+    );
     Carousel.appendCarousel(newItem);
   });
 }
@@ -160,13 +165,17 @@ function updateProgress(progressEvent) {
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
+// For some reason, my post request is erroring out, but this works in Postman
 export async function favourite(imgId) {
   // your code here
 
-  const favImage = await axios.post("https://api.thecatapi.com/v1/favourites", {
+  const imageKey = { image_id: imgId };
+
+  console.log(imgId);
+
+  await axios.post(`https://api.thecatapi.com/v1/favourites`, {
     image_id: imgId,
   });
-  console.log(favImage.data);
 }
 
 /**
@@ -178,6 +187,10 @@ export async function favourite(imgId) {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  */
+async function getFavorites() {
+  const request = axios.get("https://api.thecatapi.com/v1/favourites");
+  console.log(request.data);
+}
 
 /**
  * 10. Test your site, thoroughly!

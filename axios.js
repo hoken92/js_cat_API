@@ -28,8 +28,6 @@ initialLoad();
 async function initialLoad() {
   const response = await axios.get(`https://api.thecatapi.com/v1/breeds`);
 
-  console.log(response.data);
-
   response.data.forEach((item) => {
     let optionEl = breedSelect.appendChild(document.createElement("option"));
     optionEl.textContent = item.name;
@@ -74,8 +72,6 @@ async function createBreedElements(breed) {
     `https://api.thecatapi.com/v1/images/search?breed_id=${breedData[0].id}&limit=10`
   );
 
-  console.log(response.data);
-
   response.data.forEach((item) => {
     const newItem = Carousel.createCarouselItem(item.url, item.id);
     Carousel.appendCarousel(newItem);
@@ -101,6 +97,30 @@ async function createBreedElements(breed) {
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
 
+axios.interceptors.request.use((request) => {
+  console.log(
+    "Request sent! I'm firing after being sent and before the request reaches the server!"
+  );
+
+  document.getElementById("progressBar").style.width = "0%";
+  document.body.style.cursor = "progress";
+  return request;
+});
+
+axios.interceptors.response.use(
+  (response) => {
+    // Success: status 200 - 299
+    console.log("Successful response!");
+    document.body.style.cursor = "default";
+    return response;
+  },
+  (error) => {
+    // Failure: anything outside of status 2XX
+    console.log("Unsuccessful response...");
+    throw error;
+  }
+);
+
 /**
  * 6. Next, we'll create a progress bar to indicate the request is in progress.
  * - The progressBar element has already been created for you.
@@ -116,6 +136,13 @@ async function createBreedElements(breed) {
  *   once or twice per request to this API. This is still a concept worth familiarizing yourself
  *   with for future projects.
  */
+
+function updateProgress(progressEvent) {
+  const progressComplete = Math.floor(
+    (progressEvent.loaded / progressEvent.total) * 100
+  );
+  progressBar.style.width = progressComplete;
+}
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
@@ -135,6 +162,11 @@ async function createBreedElements(breed) {
  */
 export async function favourite(imgId) {
   // your code here
+
+  const favImage = await axios.post("https://api.thecatapi.com/v1/favourites", {
+    image_id: imgId,
+  });
+  console.log(favImage.data);
 }
 
 /**
